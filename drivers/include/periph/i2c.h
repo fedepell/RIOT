@@ -238,7 +238,7 @@ int i2c_release(i2c_t dev);
 
 /**
  * @brief   Convenience function for reading one byte from a given register
- *          address
+ *          address, where the device requires the address in big endian
  *
  * @note    This function is using a repeated start sequence for reading from
  *          the specified register address.
@@ -263,6 +263,34 @@ int i2c_release(i2c_t dev);
 
 int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
                  void *data, uint8_t flags);
+
+/**
+ * @brief   Convenience function for reading one byte from a given register
+ *          address, where the device requires the address in little endian
+ *
+ * @note    This function is using a repeated start sequence for reading from
+ *          the specified register address.
+ *
+ * @pre     i2c_acquire must be called before accessing the bus
+ *
+ * @param[in]  dev          I2C peripheral device
+ * @param[in]  reg          register address to read from (8- or 16-bit,
+ *                          right-aligned)
+ * @param[in]  addr         7-bit or 10-bit device address (right-aligned)
+ * @param[out] data         memory location to store received data
+ * @param[in]  flags        optional flags (see @ref i2c_flags_t)
+ *
+ * @return                  0 When success
+ * @return                  -EIO When slave device doesn't ACK the byte
+ * @return                  -ENXIO When no devices respond on the address sent on the bus
+ * @return                  -ETIMEDOUT  When timeout occurs before device's response
+ * @return                  -EINVAL When an invalid argument is given
+ * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
+ * @return                  -EAGAIN When a lost bus arbitration occurs
+ */
+
+int i2c_read_reg_le(i2c_t dev, uint16_t addr, uint16_t reg,
+                    void *data, uint8_t flags);
 
 /**
  * @brief   Convenience function for reading several bytes from a given
@@ -386,7 +414,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
 
 /**
  * @brief   Convenience function for writing one byte to a given
- *          register address
+ *          register address, where the device requires the address in big endian
  *
  * @note    This function is using a continuous sequence for writing to the
  *          specified register address. It first writes the register then data.
@@ -410,6 +438,33 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
  */
 int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
                   uint8_t data, uint8_t flags);
+
+/**
+ * @brief   Convenience function for writing one byte to a given
+ *          register address, where the device requires the address in little endian
+ *
+ * @note    This function is using a continuous sequence for writing to the
+ *          specified register address. It first writes the register then data.
+ *
+ * @pre     i2c_acquire must be called before accessing the bus
+ *
+ * @param[in]  dev          I2C peripheral device
+ * @param[in]  reg          register address to read from (8- or 16-bit,
+ *                          right-aligned)
+ * @param[in]  addr         7-bit or 10-bit device address (right-aligned)
+ * @param[in]  data         byte to write
+ * @param[in]  flags        optional flags (see @ref i2c_flags_t)
+ *
+ * @return                  0 When success
+ * @return                  -EIO When slave device doesn't ACK the byte
+ * @return                  -ENXIO When no devices respond on the address sent on the bus
+ * @return                  -ETIMEDOUT  When timeout occurs before device's response
+ * @return                  -EINVAL When an invalid argument is given
+ * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
+ * @return                  -EAGAIN When a lost bus arbitration occurs
+ */
+int i2c_write_reg_le(i2c_t dev, uint16_t addr, uint16_t reg,
+                     uint8_t data, uint8_t flags);
 
 /**
  * @brief   Convenience function for writing data to a given register address
